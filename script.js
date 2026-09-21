@@ -36,7 +36,6 @@ function handleRangeUpdate() {
 function handleProgress() {
   const percent = (video.currentTime / video.duration) * 100;
   progressBar.style.flexBasis = `${percent}%`;
-  progressBar.style.width = `${percent}%`;
 }
 
 // Scrub video by clicking/dragging on the progress bar
