@@ -1,171 +1,65 @@
-/* Edit this file */
-
 const player = document.querySelector(".player");
-
 const video = player.querySelector(".viewer");
-
 const progress = player.querySelector(".progress");
-
 const progressBar = player.querySelector(".progress__filled");
-
 const toggle = player.querySelector(".toggle");
-
 const skipButtons = player.querySelectorAll("[data-skip]");
-
 const ranges = player.querySelectorAll(".player__slider");
 
-
-// ---------------- PLAY / PAUSE ----------------
-
+// Toggle play / pause
 function togglePlay() {
-
   if (video.paused) {
     video.play();
   } else {
     video.pause();
   }
-
 }
 
-
-// ---------------- UPDATE BUTTON ----------------
-
+// Update play/pause toggle button text
 function updateButton() {
-
-  if (video.paused) {
-    toggle.textContent = "►";
-  } else {
-    toggle.textContent = "❚ ❚";
-  }
-
+  const icon = video.paused ? "►" : "❚ ❚";
+  toggle.textContent = icon;
 }
 
-
-// ---------------- SKIP ----------------
-
+// Skip forward / backward
 function skip() {
-
   video.currentTime += parseFloat(this.dataset.skip);
-
 }
 
-
-// ---------------- VOLUME / SPEED ----------------
-
+// Handle volume & playback speed sliders
 function handleRangeUpdate() {
-
   video[this.name] = this.value;
-
 }
 
-
-// ---------------- PROGRESS BAR ----------------
-
+// Update progress bar flex-basis
 function handleProgress() {
-
-  if (!video.duration) {
-    return;
-  }
-
-  const percent =
-    (video.currentTime / video.duration) * 100;
-
+  const percent = (video.currentTime / video.duration) * 100;
   progressBar.style.flexBasis = `${percent}%`;
-
 }
 
-
-// ---------------- SCRUB ----------------
-
+// Scrub video time via progress bar click/drag
 function scrub(e) {
-
-  if (!video.duration) {
-    return;
-  }
-
-  const scrubTime =
-    (e.offsetX / progress.offsetWidth) * video.duration;
-
+  const scrubTime = (e.offsetX / progress.offsetWidth) * video.duration;
   video.currentTime = scrubTime;
-
 }
 
-
-// ---------------- EVENT LISTENERS ----------------
-
-// Click video to play/pause
+// Event Listeners
 video.addEventListener("click", togglePlay);
-
-// Play
 video.addEventListener("play", updateButton);
-
-// Pause
 video.addEventListener("pause", updateButton);
-
-// Update progress
 video.addEventListener("timeupdate", handleProgress);
 
-// Play/pause button
 toggle.addEventListener("click", togglePlay);
 
-// Skip buttons
-skipButtons.forEach(button => {
-  button.addEventListener("click", skip);
+skipButtons.forEach((button) => button.addEventListener("click", skip));
+
+ranges.forEach((range) => {
+  range.addEventListener("change", handleRangeUpdate);
+  range.addEventListener("mousemove", handleRangeUpdate);
 });
-
-// Volume and playback speed
-ranges.forEach(range => {
-
-  range.addEventListener(
-    "change",
-    handleRangeUpdate
-  );
-
-  range.addEventListener(
-    "mousemove",
-    handleRangeUpdate
-  );
-
-});
-
-
-// ---------------- PROGRESS DRAGGING ----------------
 
 let mousedown = false;
-
 progress.addEventListener("click", scrub);
-
-progress.addEventListener("mousemove", function(e) {
-
-  if (mousedown) {
-    scrub(e);
-  }
-
-});
-
-progress.addEventListener("mousedown", function() {
-
-  mousedown = true;
-
-});
-
-progress.addEventListener("mouseup", function() {
-
-  mousedown = false;
-
-});
-
-progress.addEventListener("mouseleave", function() {
-
-  mousedown = false;
-
-});
-
-
-// ---------------- VIDEO ERROR ----------------
-
-video.addEventListener("error", function() {
-
-  console.log("Error: Unable to load download.mp4");
-
-});
+progress.addEventListener("mousemove", (e) => mousedown && scrub(e));
+progress.addEventListener("mousedown", () => (mousedown = true));
+progress.addEventListener("mouseup", () => (mousedown = false));
